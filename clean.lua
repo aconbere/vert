@@ -1,1 +1,1 @@
-os.execute("rm -rf luarocks*")
+os.execute("rm -rf build bin share")
