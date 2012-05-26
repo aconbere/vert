@@ -72,6 +72,13 @@ if not lfs.attributes(BUILD_DIR..LUAROCKS_FILENAME) then
   M.download(LUAROCKS_URI..LUAROCKS_FILENAME, BUILD_DIR..LUAROCKS_FILENAME)
 end
 
+function ensure(f, err)
+  if not f then
+    print(err)
+    os.exit()
+  end
+end
+
 function run(command, ...)
   local to_run = string.format(command, ...)
 
@@ -80,19 +87,31 @@ function run(command, ...)
   return os.execute(to_run)
 end
 
-lfs.chdir(BUILD_DIR)
-run("tar -xvpf %s", LUA_FILENAME)
-run("tar -xvpf %s", LUAROCKS_FILENAME)
 
-lfs.chdir("lua-"..LUA_VERSION)
+run("tar -xvpf %s -C %s", BUILD_DIR..LUA_FILENAME, BUILD_DIR)
+run("tar -xvpf %s -C %s", BUILD_DIR..LUAROCKS_FILENAME, BUILD_DIR)
 
-run("make %s", PLATFORM)
-run("make install INSTALL_TOP=%s", DIRECTORY)
+function build_lua(dir)
+  lfs.chdir(dir)
 
---lfs.chdir(BUILD_DIR.."luarocks-"..LUAROCKS_VERSION)
---run("./configure --prefix=%s --sysconfdir=%s --force-config --with-lua%s")
---run("cd %s; ./configure --prefix=%s --sysconfdir=%s --force-config --with-lua=/usr/local", luarocks_dir, working_dir, luarocks_dir)
---run("cd %s; make && make install", luarocks_dir)
---
---function download(url, filename)
---end
+  ensure(run("make %s", PLATFORM),
+         "make lua failed")
+  ensure(run("make install INSTALL_TOP=%s", DIRECTORY),
+         "install lua failed")
+end
+
+function build_luarocks(dir)
+  lfs.chdir(dir)
+  ensure(run("./configure --prefix=%s --sysconfdir=%s --force-config --with-lua=%s",
+             DIRECTORY, DIRECTORY, DIRECTORY),
+             "configure luarocks failed")
+  ensure(run("make"),
+         "make luarocks failed")
+  ensure(run("make install"),
+         "install luarocks failed")
+end
+
+build_lua(BUILD_DIR.."lua-"..LUA_VERSION)
+build_luarocks(BUILD_DIR.."luarocks-"..LUAROCKS_VERSION)
+
+print("ok")
