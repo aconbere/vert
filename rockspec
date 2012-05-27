@@ -4,6 +4,7 @@ version = "0.0.1"
 
 source = {
   url = "http://github.com/aconbere/vert",
+  tag = "v0.0.1"
 }
 
 description = {
