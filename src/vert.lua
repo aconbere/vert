@@ -28,16 +28,16 @@ function M.expanddir(directory)
     elseif directory:sub(1,2) == "./" then
       return lfs.currentdir()..directory:sub(3, #directory)
     else
-      return directory
+      return lfs.currentdir().."/"..directory
     end
   end
 end
 
 function M.download(url, filename)
-  http.request({ url = url
-               , method = "GET"
-               , sink = ltn12.sink.file(io.open(filename, "w"))
-               })
+  return http.request({ url = url
+                      , method = "GET"
+                      , sink = ltn12.sink.file(io.open(filename, "w"))
+                      })
 end
 
 local DIRECTORY = M.expanddir(opts[1])
@@ -47,9 +47,9 @@ if not DIRECTORY then
   return false
 end
 
-if lfs.attributes(DIRECTORY)["mode"] ~= "directory" then
-  print("error: "..DIRECTORY.." is not a directory")
-  return false
+local _dir_attrs = lfs.attributes(DIRECTORY)
+if (not _dir_attrs) or _dir_attrs["mode"] ~= "directory" then
+  lfs.mkdir(DIRECTORY)
 end
 
 local LUAROCKS_VERSION  = opts["luarocks-version"] or "2.0.8"
@@ -67,11 +67,19 @@ if not lfs.attributes(BUILD_DIR) then
 end
 
 if not lfs.attributes(BUILD_DIR..LUA_FILENAME) then
-  M.download(LUA_URI..LUA_FILENAME, BUILD_DIR..LUA_FILENAME)
+  _, status, _headers = M.download(LUA_URI..LUA_FILENAME, BUILD_DIR..LUA_FILENAME)
+  if status ~= 200 then
+    print("Failed to download lua version: "..LUA_VERSION)
+    os.exit(2)
+  end
 end
 
 if not lfs.attributes(BUILD_DIR..LUAROCKS_FILENAME) then
-  M.download(LUAROCKS_URI..LUAROCKS_FILENAME, BUILD_DIR..LUAROCKS_FILENAME)
+  _, status, _headers = M.download(LUAROCKS_URI..LUAROCKS_FILENAME, BUILD_DIR..LUAROCKS_FILENAME)
+  if status ~= 200 then
+    print("Failed to download luarocks version: "..LUAROCKS_VERSION)
+    os.exit(2)
+  end
 end
 
 function ensure(f, err)

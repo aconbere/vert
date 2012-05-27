@@ -22,7 +22,9 @@ dependencies = { "lua == 5.1"
                }
 
 build = { type = "builtin"
-        , modules = { vert = "./src/vert.lua" }
+        , modules = { vert = "./src/vert.lua" 
+                    , optimal = "./src/optimal.lua"
+                    }
         , install = { bin = { vert = "src/vert.lua" } }
         }
 

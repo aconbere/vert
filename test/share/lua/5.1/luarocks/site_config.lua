@@ -1,0 +1,12 @@
+module("luarocks.site_config")
+LUAROCKS_PREFIX=[[/home/aconbere/Projects/lua/vert/test]]
+LUA_INCDIR=[[/home/aconbere/Projects/lua/vert/test/include]]
+LUA_LIBDIR=[[/home/aconbere/Projects/lua/vert/test/lib]]
+LUA_BINDIR=[[/home/aconbere/Projects/lua/vert/test/bin]]
+LUAROCKS_SYSCONFIG=[[/home/aconbere/Projects/lua/vert/test/config.lua]]
+LUAROCKS_ROCKS_TREE=[[/home/aconbere/Projects/lua/vert/test]]
+LUAROCKS_FORCE_CONFIG=true
+LUAROCKS_UNAME_S=[[Linux]]
+LUAROCKS_UNAME_M=[[x86_64]]
+LUAROCKS_DOWNLOADER=[[wget]]
+LUAROCKS_MD5CHECKER=[[md5sum]]
