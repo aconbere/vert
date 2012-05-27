@@ -14,6 +14,105 @@ local help = [[usage: vert [--luarocks-version[ [--lua-version] <directory>
 --lua-version : lua version to compile
 ]]
 
+local activate_template = [[
+# This file must be used with "source bin/activate" *from bash*
+# you cannot run it directly
+
+deactivate () {
+    # reset old environment variables
+    if [ -n "$_OLD_VERT_PATH" ] ; then
+        PATH="$_OLD_VERT_PATH"
+        export PATH
+        unset _OLD_VERT_PATH
+    fi
+
+    if [ -n "$_OLD_VERT_LUA_PATH" ] ; then
+        LUA_PATH="$_OLD_VERT_LUA_PATH"
+        export LUA_PATH
+        unset _OLD_VERT_LUA_PATH
+    fi
+
+    if [ -n "$_OLD_VERT_LUA_CPATH" ] ; then
+        LUA_CPATH="$_OLD_VERT_LUA_CPATH"
+        export LUA_CPATH
+        unset _OLD_VERT_LUA_CPATH
+    fi
+
+    # This should detect bash and zsh, which have a hash command that must
+    # be called to get it to forget past commands.  Without forgetting
+    # past commands the $PATH changes we made may not be respected
+    if [ -n "$BASH" -o -n "$ZSH_VERSION" ] ; then
+        hash -r
+    fi
+
+    if [ -n "$_OLD_VERT_PS1" ] ; then
+        PS1="$_OLD_VERT_PS1"
+        export PS1
+        unset _OLD_VERT_PS1
+    fi
+
+    unset VERT_ENV
+    if [ ! "$1" = "nondestructive" ] ; then
+    # Self destruct!
+        unset -f deactivate
+    fi
+}
+
+# unset irrelavent variables
+deactivate nondestructive
+
+LUA_VERSION="%s"
+export LUA_VERSION
+VERT_ENV="%s"
+export VERT_ENV
+
+_OLD_VERT_PATH="$PATH"
+PATH="$VERT_ENV/bin:$PATH"
+export PATH
+
+# unset LUA_PATH if set
+# this will fail if LUA_PATH is set to the empty string (which is bad anyway)
+# could use `if (set -u; : $LUA_PATH) ;` in bash
+if [ -n "$LUA_PATH" ] ; then
+    _OLD_VERT_LUA_PATH="$LUA_PATH"
+    unset LUA_PATH
+fi
+
+if [ -n "$LUA_CPATH" ] ; then
+    _OLD_VERT_LUA_CPATH="$LUA_CPATH"
+    unset LUA_CPATH
+fi
+
+LUA_PATH="$VERT_ENV/share/lua/$LUA_VERSION//?.lua;/$VERT_ENV/lib/luarocks/?.lua"
+export LUA_PATH
+
+LUA_CPATH="$VERT_ENV/share/lua/$LUA_VERSION//?.lua;/$VERT_ENV/lib/luarocks/?.lua"
+export LUA_CPATH
+
+if [ -z "$VERT_ENV_DISABLE_PROMPT" ] ; then
+    _OLD_VERT_PS1="$PS1"
+    if [ "x" != x ] ; then
+	PS1="$PS1"
+    else
+    if [ "`basename \"$VERT_ENV\"`" = "__" ] ; then
+        # special case for Aspen magic directories
+        # see http://www.zetadev.com/software/aspen/
+        PS1="[`basename \`dirname \"$VERT_ENV\"\``] $PS1"
+    else
+        PS1="(`basename \"$VERT_ENV\"`)$PS1"
+    fi
+    fi
+    export PS1
+fi
+
+# This should detect bash and zsh, which have a hash command that must
+# be called to get it to forget past commands.  Without forgetting
+# past commands the $PATH changes we made may not be respected
+if [ -n "$BASH" -o -n "$ZSH_VERSION" ] ; then
+    hash -r
+fi
+]]
+
 
 local M = {}
 
@@ -108,6 +207,7 @@ function build_lua(dir)
          "make lua failed")
   ensure(run("make install INSTALL_TOP=%s", DIRECTORY),
          "install lua failed")
+  lfs.chdir(CURRENT_DIR)
 end
 
 function build_luarocks(dir)
@@ -119,9 +219,23 @@ function build_luarocks(dir)
          "make luarocks failed")
   ensure(run("make install"),
          "install luarocks failed")
+  lfs.chdir(CURRENT_DIR)
+end
+
+function write_activate_script(lua_version, vert_path)
+  local activate_file, err = io.open(DIRECTORY.."/bin/activate", "w+")
+  if not activate_file then
+    print("Failed to open activate file: "..err)
+    os.exit(3)
+  end
+
+  activate_file:write(string.format(activate_template, lua_version, vert_path))
+  activate_file:close()
 end
 
 build_lua(BUILD_DIR.."lua-"..LUA_VERSION)
 build_luarocks(BUILD_DIR.."luarocks-"..LUAROCKS_VERSION)
+
+write_activate_script(LUA_VERSION, DIRECTORY)
 
 print("ok")
