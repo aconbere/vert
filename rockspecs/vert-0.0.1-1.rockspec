@@ -19,7 +19,6 @@ description = { summary = "Creates isolated development environment"
 dependencies = { "lua == 5.1"
                , "luafilesystem"
                , "luasocket"
-               , "lzlib"
                }
 
 build = { type = "builtin"
