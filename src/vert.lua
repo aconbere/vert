@@ -1,3 +1,5 @@
+#!/usr/bin/env lua
+
 local io      = require("io")
 local lfs     = require("lfs")
 local http    = require("socket.http")
