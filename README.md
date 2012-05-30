@@ -36,3 +36,8 @@ to the particular virtual env you're working on.
 Once an environment is activate simple run `deactivate` to exit
 
     (vert)$> deactivate
+
+## Platform Support
+
+Currently I've only tested this on linux, though given lua's support for many
+platforms I don't see this approaching being difficult on most Unixes"
