@@ -2,8 +2,8 @@ package = "Vert"
 
 version = "0.0.3-1"
 
-source = { url    = "git://github.com/aconbere/vert.git"
-         , tag = "v0.0.3-rc1"
+source = { url = "git://github.com/aconbere/vert.git"
+         , tag = "v0.0.3"
          }
 
 description = { summary = "Creates isolated development environment"
