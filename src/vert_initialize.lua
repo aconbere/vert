@@ -6,7 +6,8 @@ function M.init(opts)
   local lfs     = require("lfs")
   local utils   = require("utils")
 
-  local help = [[usage: vert [--luarocks-version[ [--lua-version] <directory>
+  local help = [[usage: vert [--luarocks-version[ [--lua-version]
+                             [--platform] <directory>
 
   --luarocks-version : luarocks version to install
   --lua-version : lua version to compile
