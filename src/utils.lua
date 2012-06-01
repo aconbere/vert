@@ -20,6 +20,11 @@ function M.run(command, ...)
   return os.execute(to_run)
 end
 
+function M.isdir(dir)
+  local dir_attrs = lfs.attributes(dir)
+  return dir_attrs and (dir_attrs["mode"] == "directory")
+end
+
 function M.expanddir(directory)
   if directory then
     if directory:sub(1,1) == "~" then
