@@ -22,10 +22,15 @@ dependencies = { "lua == 5.1"
                }
 
 build = { type = "builtin"
-        , modules = { vert    = "./src/vert.lua" 
-                    , optimal = "./src/optimal.lua"
-                    , utils   = "./src/utils.lua"
+        , modules = { optimal   = "./src/optimal.lua"
+                    , utils     = "./src/utils.lua"
+                    , vert_init = "./src/vert_init.lua"
+                    , vert_ls   = "./src/vert_ls.lua"
+                    , vert_make = "./src/vert_make.lua"
+                    , vert_rm   = "./src/vert_rm.lua"
+                    , vert      = "./src/vert.lua" 
                     }
+
         , install = { bin = { vert         = "src/vert.lua"
                             , vert_wrapper = "src/vert_wrapper.sh"
                             }
