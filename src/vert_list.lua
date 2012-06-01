@@ -18,7 +18,7 @@ function M.list_files(dir)
   return files
 end
 
-function M.ls(opts)
+function M.list(opts)
   local lfs     = require("lfs")
   local utils   = require("utils")
 
@@ -32,4 +32,4 @@ function M.ls(opts)
   end
 end
 
-return M.ls
+return M.list

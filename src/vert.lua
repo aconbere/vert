@@ -10,7 +10,8 @@ local C = { init     = require("vert_initialize")
           , ls       = require("vert_list")
           }
 
-local help = [[ usage: vert <command> [<args>]
+local help = [[usage: vert <command> [<args>]
+
 The available subcommands are:
   make       Create a new virtualenv in ~/.verts   
   init       Make a new virtual environment

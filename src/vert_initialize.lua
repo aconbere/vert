@@ -129,12 +129,14 @@ function M.init(opts)
   fi
   ]=]
 
-  local DIRECTORY = utils.expanddir(opts[2])
+  local directory = opts[2]
 
-  if not DIRECTORY then
+  if (not directory) or (#directory == 0) then
     print(help)
-    return false
+    os.exit(1)
   end
+
+  local DIRECTORY = utils.expanddir(directory)
 
   if not utils.isdir(DIRECTORY) then
     lfs.mkdir(DIRECTORY)
