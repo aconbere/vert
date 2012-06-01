@@ -2,8 +2,8 @@ package = "Vert"
 
 version = "0.0.3-1"
 
-source = { url = "git://github.com/aconbere/vert.git"
-         , tag = "v0.0.3"
+source = { url    = "git://github.com/aconbere/vert.git"
+         , branch = "subcommands"
          }
 
 description = { summary = "Creates isolated development environment"
@@ -26,10 +26,8 @@ build = { type = "builtin"
                     , optimal = "./src/optimal.lua"
                     , utils   = "./src/utils.lua"
                     }
-        , install = { bin = { ["vert"]     = "src/vert.lua"
-                            , ["verton.sh] = "src/verton.sh"
+        , install = { bin = { vert         = "src/vert.lua"
+                            , vert_wrapper = "src/vert_wrapper.sh"
                             }
                     }
         }
-
-
