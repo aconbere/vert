@@ -10,6 +10,7 @@ function M.init(opts)
 
   --luarocks-version : luarocks version to install
   --lua-version : lua version to compile
+  --platform : platform to compile to default is "linux"
   ]]
 
   local activate_template = [=[
@@ -144,12 +145,13 @@ function M.init(opts)
 
   local LUAROCKS_VERSION  = opts["luarocks-version"] or "2.0.8"
   local LUA_VERSION       = opts["lua-version"] or "5.1.5"
+  local PLATFORM          = opts["platform"]
+
   local LUAROCKS_URI      = "http://luarocks.org/releases/"
   local LUA_URI           = "http://www.lua.org/ftp/"
   local LUA_FILENAME      = "lua-"..LUA_VERSION..".tar.gz"
   local LUAROCKS_FILENAME = "luarocks-"..LUAROCKS_VERSION..".tar.gz"
   local BUILD_DIR         = DIRECTORY.."/build/"
-  local PLATFORM          = "linux"
   local CURRENT_DIR       = lfs.currentdir()
 
   if not utils.isdir(BUILD_DIR) then
