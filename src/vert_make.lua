@@ -5,7 +5,7 @@ local M = {}
 function M.make(opts)
   local lfs   = require("lfs")
   local utils = require("utils")
-  local init  = require("vert_init")
+  local init  = require("vert_initialize")
 
   local help = [=[usage: vert make <name> [--lua-version] [--luarocks--version]]=]
 

@@ -3,7 +3,7 @@ package = "Vert"
 version = "0.0.3-1"
 
 source = { url    = "git://github.com/aconbere/vert.git"
-         , branch = "subcommands"
+         , tag = "v0.0.3-rc1"
          }
 
 description = { summary = "Creates isolated development environment"
@@ -22,13 +22,13 @@ dependencies = { "lua == 5.1"
                }
 
 build = { type = "builtin"
-        , modules = { optimal   = "./src/optimal.lua"
-                    , utils     = "./src/utils.lua"
-                    , vert_init = "./src/vert_init.lua"
-                    , vert_ls   = "./src/vert_ls.lua"
-                    , vert_make = "./src/vert_make.lua"
-                    , vert_rm   = "./src/vert_rm.lua"
-                    , vert      = "./src/vert.lua" 
+        , modules = { optimal         = "./src/optimal.lua"
+                    , utils           = "./src/utils.lua"
+                    , vert_initialize = "./src/vert_initialize.lua"
+                    , vert_list       = "./src/vert_list.lua"
+                    , vert_make       = "./src/vert_make.lua"
+                    , vert_remove     = "./src/vert_remove.lua"
+                    , vert            = "./src/vert.lua" 
                     }
 
         , install = { bin = { vert         = "src/vert.lua"
