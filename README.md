@@ -3,6 +3,17 @@
 Produces a localized install of lua and luarocks for isolated installation and
 running of lua programs.
 
+## Installing Vert
+
+    $> luarocks install vert
+
+This will install the `vert` command and add a file `vert_wrapper` to your path
+`vert` is the main way you'll interface with virtual environments. By sourcing
+`vert_wrapper` in your shells initialization script (bashrc, zshrc, etc,) your
+shell will be embued with the very helpful `verton` function. This will enable
+you to keep a collection of environments in a single directory to turn on or
+off as you please.
+
 ## Creating an environment
 
 To run vert just run `vert init` with the path to the directory to install into
