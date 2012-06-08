@@ -28,7 +28,7 @@ build = { type = "builtin"
                     , vert_list       = "./src/vert_list.lua"
                     , vert_make       = "./src/vert_make.lua"
                     , vert_remove     = "./src/vert_remove.lua"
-                    , vert            = "./src/vert.lua" 
+                    , vert            = "./src/vert.lua"
                     }
 
         , install = { bin = { vert         = "src/vert.lua"

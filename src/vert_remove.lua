@@ -10,7 +10,7 @@ function M.rmdir(dir, args)
   assert(utils.isdir(dir), "dir is not a directory")
 
   local force = args and args["force"]
-  
+
   if not force then
     return lfs.rmdir(dir)
   end
@@ -43,7 +43,7 @@ end
 function M.remove(opts)
 
   local help = [[usage: vert rm <name>]]
-  
+
   local vert_name = opts[2]
 
   if not vert_name then

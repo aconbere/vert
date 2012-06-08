@@ -30,7 +30,7 @@ build_lua () {
     echo "build_lua takes 3 arguments 0 given"
   fi
   local version=$1
-  
+
   if [[ ! "$2" ]]
   then
     echo "build_lua takes 3 arguments 1 given"
