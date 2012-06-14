@@ -50,39 +50,5 @@ function M.download(url, filename)
                       })
 end
 
-function M.build_lua(lua_dir, platform, top)
-  local current_dir = lfs.currentdir()
-  lfs.chdir(lua_dir)
-
-  M.ensure(M.run("make %s", platform), "make lua failed")
-  M.ensure(M.run("make install INSTALL_TOP=%s", top),
-         "install lua failed")
-  lfs.chdir(current_dir)
-end
-
-function M.build_luarocks(luarocks_dir, prefix)
-  local current_dir = lfs.currentdir()
-  lfs.chdir(luarocks_dir)
-  M.ensure(M.run("./configure --prefix=%s --sysconfdir=%s --force-config --with-lua=%s",
-             prefix, prefix, prefix),
-             "configure luarocks failed")
-  M.ensure(M.run("make"),
-         "make luarocks failed")
-  M.ensure(M.run("make install"),
-         "install luarocks failed")
-  lfs.chdir(current_dir)
-end
-
-function M.write_activate_script(template, lua_version, prefix)
-  local activate_file, err = io.open(prefix.."/bin/activate", "w+")
-
-  if not activate_file then
-    print("Failed to open activate file: "..err)
-    os.exit(3)
-  end
-
-  activate_file:write(string.format(template, lua_version, prefix))
-  activate_file:close()
-end
 
 return M

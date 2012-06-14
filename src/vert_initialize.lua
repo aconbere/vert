@@ -1,16 +1,58 @@
 #!/usr/bin/env lua
 
-local M = {}
+local utils = require("utils")
+local lfs   = require("lfs")
+
+local luajit_installer = Installable.new({
+  uri = "http://luajit.org/download/",
+  filename = "LuaJIT-%s.tar.gz",
+  make_tasks = {
+    { command = "make %s PREFIX=%s", "platform", "prefix" },
+    { command = "make install PREFIX=%s", "prefix" }
+  }
+})
+
+local lua_installer = Installable.new({
+  uri = "http://www.lua.org/ftp/",
+  filename = "lua-%s.tar.gz",
+  make_tasks = {
+    { command = "make %s", "platform" },
+    { command = "make install INSTALL_TOP=%s", "prefix" }
+  }
+})
+
+local luarocks_installer = Installable.new({
+  uri       = "http://luarocks.org/releases/",
+  filename  = "luarocks-%s.tar.gz",
+  make_tasks = {
+    { command = "./configure --prefix=%s --sysconfdir=%s --force-config --with-lua=%s", "prefix", "prefix", "prefix" },
+    { command = "make" },
+    { command = "make install" }
+  }
+})
+
+function M.write_activate_script(template, lua_version, prefix)
+  local activate_file, err = io.open(prefix.."/bin/activate", "w+")
+
+  if not activate_file then
+    print("Failed to open activate file: "..err)
+    os.exit(3)
+  end
+
+  activate_file:write(string.format(template, lua_version, prefix))
+  activate_file:close()
+end
 
 function M.init(opts)
   local lfs     = require("lfs")
   local utils   = require("utils")
 
   local help = [[usage: vert [--luarocks-version[ [--lua-version]
-                             [--platform] <directory>
+                             [--lua-implimentation] [--platform] <directory>
 
   --luarocks-version : luarocks version to install
   --lua-version : lua version to compile
+  --lua-implimentation : lua implimentation to compile [lua | luajit]
   --platform : platform to compile to default is "linux"
   ]]
 
@@ -131,7 +173,17 @@ function M.init(opts)
   fi
   ]=]
 
-  local directory = opts[2]
+  local DIRECTORY          = opts[2]
+  local LUAROCKS_VERSION   = opts["luarocks-version"]   or "2.0.8"
+  local LUA_VERSION        = opts["lua-version"]        or "5.1.5"
+  local LUA_IMPLIMENTATION = opts["lua-implimentation"] or "lua"
+  local PLATFORM           = opts["platform"]           or "linux"
+  local BUILD_DIR          = DIRECTORY.."/build/"
+
+  if not I[LUA_IMPLIMENTATION] then
+    print("invalid implimentation choice")
+    os.exit(1)
+  end
 
   if (not directory) or (#directory == 0) then
     print(help)
@@ -144,45 +196,15 @@ function M.init(opts)
     lfs.mkdir(DIRECTORY)
   end
 
-  local LUAROCKS_VERSION  = opts["luarocks-version"] or "2.0.8"
-  local LUA_VERSION       = opts["lua-version"] or "5.1.5"
-  local PLATFORM          = opts["platform"]
-
-  local LUAROCKS_URI      = "http://luarocks.org/releases/"
-  local LUA_URI           = "http://www.lua.org/ftp/"
-  local LUA_FILENAME      = "lua-"..LUA_VERSION..".tar.gz"
-  local LUAROCKS_FILENAME = "luarocks-"..LUAROCKS_VERSION..".tar.gz"
-  local BUILD_DIR         = DIRECTORY.."/build/"
-  local CURRENT_DIR       = lfs.currentdir()
-
   if not utils.isdir(BUILD_DIR) then
     lfs.mkdir(BUILD_DIR)
   end
 
-  if not lfs.attributes(BUILD_DIR..LUA_FILENAME) then
-    local _, status, _headers = utils.download(LUA_URI..LUA_FILENAME, BUILD_DIR..LUA_FILENAME)
-    if status ~= 200 then
-      print("Failed to download lua version: "..LUA_VERSION.." at "..LUA_URI..LUA_FILENAME)
-      os.exit(2)
-    end
-  end
+  print("installing ".. LUA_IMPLIMENTATION.." version: "..LUA_VERSION)
 
-  if not lfs.attributes(BUILD_DIR..LUAROCKS_FILENAME) then
-    local _, status, _headers = utils.download(LUAROCKS_URI..LUAROCKS_FILENAME, BUILD_DIR..LUAROCKS_FILENAME)
-    if status ~= 200 then
-      print("Failed to download luarocks version: "..LUAROCKS_VERSION)
-      os.exit(2)
-    end
-  end
+  I[LUA_IMPLIMENTATION].install(BUILD_DIR, LUA_VERSION, PLATFORM, DIRECTORY)
 
-  utils.run("tar -xvpf %s -C %s", BUILD_DIR..LUA_FILENAME, BUILD_DIR)
-  utils.run("tar -xvpf %s -C %s", BUILD_DIR..LUAROCKS_FILENAME, BUILD_DIR)
-
-  local lua_dir = BUILD_DIR.."lua-"..LUA_VERSION
-  local luarocks_dir = BUILD_DIR.."luarocks-"..LUAROCKS_VERSION
-
-  utils.build_lua(lua_dir, "linux", DIRECTORY)
-  utils.build_luarocks(luarocks_dir, DIRECTORY)
+  M.install_luarocks(BUILD_DIR, LUAROCKS_VERSION, DIRECTORY)
   utils.write_activate_script(activate_template, LUA_VERSION:sub(1,3), DIRECTORY)
 
   print("ok")

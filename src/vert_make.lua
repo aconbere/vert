@@ -23,9 +23,10 @@ function M.make(opts)
 
   local vert_dir = verts_dir.."/"..vert_name
 
-  init({ ["lua-version"]      = opts["lua-version"]
-       , ["luarocks-version"] = opts["luarocks-version"]
-       , [2]                  = vert_dir
+  init({ ["lua-version"]        = opts["lua-version"]
+       , ["lua-implimentation"] = opts["lua-implimentation"]
+       , ["luarocks-version"]   = opts["luarocks-version"]
+       , [2]                    = vert_dir
        })
 
   print("ok")
