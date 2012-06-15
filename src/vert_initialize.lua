@@ -12,6 +12,7 @@ installers.luajit = Installable.new({
   remote_filename = "LuaJIT-%s.tar.gz",
   local_filename  = "LuaJIT-%s",
   version         = "2.0.0-beta10",
+  include         = "/include/luajit-2.0",
 
   make_tasks = {
     { "make PREFIX=%s","platform", "prefix" },
