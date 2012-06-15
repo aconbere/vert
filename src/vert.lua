@@ -1,19 +1,17 @@
 #!/usr/bin/env lua
 
-local lfs     = require("lfs")
 local optimal = require("optimal")
-local utils   = require("utils")
 
-local C = { init     = require("vert_initialize")
-          , make     = require("vert_make")
-          , rm       = require("vert_remove")
-          , ls       = require("vert_list")
-          }
+local commands = { init = require("vert_initialize")
+                 , make = require("vert_make")
+                 , rm   = require("vert_remove")
+                 , ls   = require("vert_list")
+                 }
 
 local help = [[usage: vert <command> [<args>]
 
 The available subcommands are:
-  make       Create a new virtualenv in ~/.verts   
+  make       Create a new virtualenv in ~/.verts
   init       Make a new virtual environment
   rm         remove a virtual environment
   ls         Show a list of registered environments
@@ -21,16 +19,16 @@ The available subcommands are:
 
 local opts = optimal.parse(...)
 
-if not opts[1] then
-  print(help)
-  os.exit(0)
-end
+local command = opts[1]
 
-if not C[opts[1]] then
-  print("vert: "..opts[1].." is not a vert command. See 'vert --help'.")
+if not command then
+  print(help)
   os.exit(1)
 end
 
-command = C[opts[1]]
+if not commands[command] then
+  print("vert: "..command.." is not a vert command. See 'vert --help'.")
+  os.exit(1)
+end
 
-command(opts)
+commands[command].run(opts)

@@ -3,9 +3,9 @@
 local lfs     = require("lfs")
 local utils   = require("utils")
 
-local M = {}
+local _M = {}
 
-function M.rmdir(dir, args)
+function _M.rmdir(dir, args)
   assert(dir, "dir cannot be nil")
   assert(utils.isdir(dir), "dir is not a directory")
 
@@ -24,7 +24,7 @@ function M.rmdir(dir, args)
       local path = dir..name
       local attrs = lfs.attributes(dir..name)
       if attrs["mode"] == "directory" then
-        local _, err = M.rmdir(path, args)
+        local _, err = _M.rmdir(path, args)
         if err then
           return nil, err
         end
@@ -40,7 +40,7 @@ function M.rmdir(dir, args)
   return lfs.rmdir(dir)
 end
 
-function M.remove(opts)
+function _M.run(opts)
 
   local help = [[usage: vert rm <name>]]
 
@@ -59,7 +59,7 @@ function M.remove(opts)
     os.exit(1)
   end
 
-  local _, err = M.rmdir(vert_dir, { force = true })
+  local _, err = _M.rmdir(vert_dir, { force = true })
   if err then
     print("ERROR: "..err)
     os.exit(1)
@@ -68,4 +68,4 @@ function M.remove(opts)
   print("ok")
 end
 
-return M.remove
+return _M

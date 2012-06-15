@@ -1,13 +1,16 @@
 #!/usr/bin/env lua
 
-local M = {}
+local _M = {}
 
-function M.make(opts)
+function _M.run(opts)
   local lfs   = require("lfs")
   local utils = require("utils")
-  local init  = require("vert_initialize")
+  local init = require("vert_initialize")
 
-  local help = [=[usage: vert make <name> [--lua-version] [--luarocks--version]]=]
+  local help = [=[
+usage: vert make [--lua-version] [--luarocks--version] [--lua-implimentation]
+                 [--platform] <name>
+]=]
 
   local vert_name = opts[2]
 
@@ -21,15 +24,11 @@ function M.make(opts)
     lfs.mkdir(verts_dir)
   end
 
-  local vert_dir = verts_dir.."/"..vert_name
+  opts[2] = verts_dir.."/"..vert_name
 
-  init({ ["lua-version"]        = opts["lua-version"]
-       , ["lua-implimentation"] = opts["lua-implimentation"]
-       , ["luarocks-version"]   = opts["luarocks-version"]
-       , [2]                    = vert_dir
-       })
+  init.do_init(opts)
 
   print("ok")
 end
 
-return M.make
+return _M

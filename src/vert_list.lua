@@ -1,8 +1,8 @@
 #!/usr/bin/env lua
 
-local M = {}
+local _M = {}
 
-function M.list_files(dir)
+function _M.list_files(dir)
   local files = {}
 
   for filename in lfs.dir(dir) do
@@ -18,7 +18,7 @@ function M.list_files(dir)
   return files
 end
 
-function M.list(opts)
+function _M.run(opts)
   local lfs     = require("lfs")
   local utils   = require("utils")
 
@@ -32,4 +32,4 @@ function M.list(opts)
   end
 end
 
-return M.list
+return _M
