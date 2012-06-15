@@ -1,6 +1,8 @@
 local utils = require("utils")
 local class = require("class")
 local lfs   = require("lfs")
+local http  = require("socket.http")
+local ltn12 = require("ltn12")
 
 local Cache = class()
 
@@ -32,7 +34,7 @@ function Cache:try(name, callback)
   end
 end
 
-function Cache:download()
+function Cache:download(url, filename)
   return http.request({ url = url
                       , method = "GET"
                       , sink = ltn12.sink.file(io.open(filename, "w"))
@@ -45,8 +47,12 @@ function Cache:get_or_download(filename, uri)
 
   self:try(filename, function (name)
     local remote_path = uri..filename
-    local _, status, _headers = utils.download(remote_path, self:path(name))
-    assert(status == 200, "Failed to download: "..filename)
+    print(remote_path)
+    local _, status, _headers = self:download(remote_path, self:path(name))
+    if status ~= 200 then
+      os.remove(self:path(name))
+      error("Failed to download: "..filename)
+    end
   end)
 end
 

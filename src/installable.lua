@@ -10,6 +10,7 @@ function Installable:init(args)
   self._remote_filename = args.remote_filename
   self._local_filename  = args.local_filename
   self._make_tasks      = args.make_tasks
+  self._version         = args.version
 
   assert(self._remote_filename, "Installable: remote filename required")
 
@@ -30,7 +31,7 @@ end
 
 function Installable:untar(build_dir, version)
   local pathname = self.cache.cache_dir.."/"..self:remote_filename(version)
-  utils.ensure(utils.run("tar -xvpf %s -C %s", pathname, build_dir))
+  utils.ensure(utils.run("tar -xpf %s -C %s", pathname, build_dir))
 end
 
 local function mget(table, keys)
@@ -50,12 +51,13 @@ function Installable:run_task(task, args)
 end
 
 function Installable:install(args)
+  local version = args.version or self._version
   local current_dir = lfs.currentdir()
 
-  self:download(args.build_dir, args.version)
-  self:untar(args.build_dir, args.version)
+  self:download(args.build_dir, version)
+  self:untar(args.build_dir, version)
 
-  lfs.chdir(self:local_pathname(args.build_dir, args.version))
+  lfs.chdir(self:local_pathname(args.build_dir, version))
 
   if self._make_tasks then
     for i, task in ipairs(self._make_tasks) do
