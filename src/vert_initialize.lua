@@ -11,7 +11,7 @@ function M.init(opts)
 
   --luarocks-version : luarocks version to install
   --lua-version : lua version to compile
-  --platform : platform to compile to default is "linux"
+  --platform : platform to compile. Default is "linux"; choices are "aix" "ansi" "bsd" "freebsd" "generic" "linux" "macosx" "mingw" "posix" "solaris" although almost all are untested with vert.
   ]]
 
   local activate_template = [=[
@@ -146,7 +146,7 @@ function M.init(opts)
 
   local LUAROCKS_VERSION  = opts["luarocks-version"] or "2.0.8"
   local LUA_VERSION       = opts["lua-version"] or "5.1.5"
-  local PLATFORM          = opts["platform"]
+  local PLATFORM          = opts["platform"] or "linux"
 
   local LUAROCKS_URI      = "http://luarocks.org/releases/"
   local LUA_URI           = "http://www.lua.org/ftp/"
@@ -181,7 +181,7 @@ function M.init(opts)
   local lua_dir = BUILD_DIR.."lua-"..LUA_VERSION
   local luarocks_dir = BUILD_DIR.."luarocks-"..LUAROCKS_VERSION
 
-  utils.build_lua(lua_dir, "linux", DIRECTORY)
+  utils.build_lua(lua_dir, PLATFORM, DIRECTORY)
   utils.build_luarocks(luarocks_dir, DIRECTORY)
   utils.write_activate_script(activate_template, LUA_VERSION:sub(1,3), DIRECTORY)
 
