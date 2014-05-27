@@ -144,7 +144,7 @@ function M.init(opts)
     lfs.mkdir(DIRECTORY)
   end
 
-  local LUAROCKS_VERSION  = opts["luarocks-version"] or "2.0.8"
+  local LUAROCKS_VERSION  = opts["luarocks-version"] or "2.1.2"
   local LUA_VERSION       = opts["lua-version"] or "5.1.5"
   local PLATFORM          = opts["platform"] or "linux"
 
