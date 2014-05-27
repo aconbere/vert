@@ -31,6 +31,6 @@ if not C[opts[1]] then
   os.exit(1)
 end
 
-command = C[opts[1]]
+local command = C[opts[1]]
 
 command(opts)

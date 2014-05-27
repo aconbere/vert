@@ -32,7 +32,7 @@ function M.get_short_opt(s)
 end
 
 function M.get_long_assignment(s)
-  start, _end = s:find("=")
+  local start, _end = s:find("=")
   return s:sub(3, start-1), s:sub(_end+1, #s)
 end
 
@@ -40,11 +40,12 @@ end
 
 
 function M.parse(...)
-  args = {...}
-  options = {}
+  local args = {...}
+  local options = {}
 
-  order = 1
+  local order = 1
 
+  local key, value
   for i, v in ipairs(args) do
     if M.is_long_opt(v) then
       key, value = M.get_long_opt(v)
