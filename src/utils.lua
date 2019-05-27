@@ -14,7 +14,6 @@ end
 
 function M.run(command, ...)
   local to_run = string.format(command, ...)
-
   print("EXECUTING:", to_run)
 
   return os.execute(to_run)
@@ -85,4 +84,41 @@ function M.write_activate_script(template, lua_version, prefix)
   activate_file:close()
 end
 
+function M.get_os()
+  local os_name = 'unknown'
+        -- is popen supported?
+        local popen_status, popen_result = pcall(io.popen, "")
+        if popen_status then
+                popen_result:close()
+                -- Unix-based OS
+                raw_os_name = io.popen('uname -s','r'):read('*l')
+        else
+                -- windows
+                local env_OS = os.getenv('OS')
+                if env_OS then
+                        raw_os_name= env_OS
+                end
+        end
+
+        os_name = (raw_os_name):lower()
+
+        local os_patterns = {
+                ['windows'] = 'windows',
+                ['linux'] = 'Linux',
+                ['mac'] = 'macosx',
+                ['darwin'] = 'macosx',
+                ['^mingw'] = 'windows',
+                ['^cygwin'] = 'windows',
+                ['bsd$'] = 'BSD',
+                ['SunOS'] = 'Solaris',
+        }
+
+        for pattern, name in pairs(os_patterns) do
+                if os_name:match(pattern) then
+                        os_name = name
+                        break
+                end
+        end
+        return os_name
+end
 return M

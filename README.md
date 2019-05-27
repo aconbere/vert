@@ -31,6 +31,11 @@ flags `--lua-version` and `--luarocks-version`
     (vert) $> lua
     Lua 5.2.0  Copyright (C) 1994-2011 Lua.org, PUC-Rio
 
+You can specify which platform to use using `--platform` flag
+    supported platforms:
+    macosx
+    windows
+If you don't specify a platform it will be detected automatically
 ## Activating an environment
 
 There isn't really any magic in Vert, and getting running in a virtual
