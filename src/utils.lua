@@ -15,7 +15,6 @@ end
 function M.run(command, ...)
   local to_run = string.format(command, ...)
   print("EXECUTING:", to_run)
-
   return os.execute(to_run)
 end
 
@@ -104,13 +103,13 @@ function M.get_os()
 
         local os_patterns = {
                 ['windows'] = 'windows',
-                ['linux'] = 'Linux',
+                ['linux'] = 'linux',
                 ['mac'] = 'macosx',
                 ['darwin'] = 'macosx',
                 ['^mingw'] = 'windows',
                 ['^cygwin'] = 'windows',
-                ['bsd$'] = 'BSD',
-                ['SunOS'] = 'Solaris',
+                ['bsd$'] = 'bsd',
+                ['SunOS'] = 'solaris',
         }
 
         for pattern, name in pairs(os_patterns) do
