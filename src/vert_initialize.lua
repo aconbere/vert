@@ -8,10 +8,11 @@ function M.init(opts)
   local home_dir = os.getenv("HOME") or ""
   -- configurtion file if exists should be at: $HOME/.vert/vert_config.cfg
   package.path = package.path..";"..home_dir.."/.vert/?.cfg"
-  local help = [[usage: vert [--luarocks-version[ [--lua-version]
+  local help = [[usage: vert [--luarocks-version] [--lua-version] [--lua-source]
                              [--platform] <directory>
   --luarocks-version : luarocks version to install
   --lua-version : lua version to compile
+  --lua-source : lua or luajit (defaults to lua)
   --platform : platform to compile to. If not specified, it will be automtically detected. Choices are "aix" "ansi" "bsd" "freebsd" "generic" "linux" "macosx" "mingw" "posix" "solaris" although almost all are untested with vert
   ]]
   local activate_template = [=[
@@ -75,8 +76,8 @@ function M.init(opts)
 
   deactivate nondestructive
 
-  LUA_VERSION="%s"
-  VERT="%s"
+  LUA_VERSION="%{lua_version}"
+  VERT="%{prefix}"
 
   export LUA_VERSION
   export VERT
@@ -115,8 +116,8 @@ function M.init(opts)
       export _OLD_VERT_PATH
   fi
 
-  LUA_PATH="./?.lua;$VERT/share/lua/$LUA_VERSION/?.lua;$VERT/share/lua/$LUA_VERSION/?/init.lua;$VERT/lib/lua/$LUA_VERSION/?.lua;$VERT/lib/lua/$LUA_VERSION/?/init.lua"
-  LUA_CPATH="./?.so;$VERT/lib/lua/$LUA_VERSION/?.so;$VERT/lib/lua/$LUA_VERSION/loadall.so"
+  LUA_PATH="./?.lua;$VERT/share/lua/$LUA_VERSION/?.lua;$VERT/share/lua/$LUA_VERSION/?/init.lua;$VERT/lib/lua/$LUA_VERSION/?.lua;$VERT/lib/lua/$LUA_VERSION/?/init.lua%{extra_path}"
+  LUA_CPATH="./?.so;$VERT/lib/lua/$LUA_VERSION/?.so;$VERT/lib/lua/$LUA_VERSION/loadall.so%{extra_cpath}"
   PATH="$VERT/bin:$PATH"
 
   export LUA_PATH
@@ -144,13 +145,34 @@ function M.init(opts)
     lfs.mkdir(DIRECTORY)
   end
 
+  local activate_script_params = {}
+
+  local LUA_URI, LUA_VERSION, LUA_NAME_PREFIX, LUA_COMPAT_VERSION
+  local lua_build_function
+
+  if (opts["lua-source"] or "lua") == "lua" then
+    LUA_VERSION        = opts["lua-version"] or "5.3.5"
+    LUA_URI            = "http://www.lua.org/ftp/"
+    LUA_NAME_PREFIX    = "lua-"
+    LUA_COMPAT_VERSION = LUA_VERSION:match("^%d+%.%d+")
+    lua_build_function = utils.build_lua
+  elseif opts["lua-source"] == "luajit" then
+    LUA_VERSION        = opts["lua-version"] or "2.1.0-beta3"
+    LUA_URI            = "https://luajit.org/download/"
+    LUA_NAME_PREFIX    = "LuaJIT-"
+    LUA_COMPAT_VERSION = "5.1"
+    lua_build_function = utils.build_luajit
+    activate_script_params.extra_path = ";$VERT/share/luajit-"..LUA_VERSION.."/?.lua"
+  else
+    print("Invalid source: "..opts["lua-source"]..", only lua and luajit are supported")
+    os.exit(2)
+  end
+
   local LUAROCKS_VERSION  = opts["luarocks-version"] or "3.1.2"
-  local LUA_VERSION       = opts["lua-version"] or "5.3.5"
   local PLATFORM          = opts["platform"] or utils.get_os()
 
   local LUAROCKS_URI      = "http://luarocks.org/releases/"
-  local LUA_URI           = "http://www.lua.org/ftp/"
-  local LUA_FILENAME      = "lua-"..LUA_VERSION..".tar.gz"
+  local LUA_FILENAME      = LUA_NAME_PREFIX..LUA_VERSION..".tar.gz"
   local LUAROCKS_FILENAME = "luarocks-"..LUAROCKS_VERSION..".tar.gz"
   local BUILD_DIR         = DIRECTORY.."/build/"
   local CURRENT_DIR       = lfs.currentdir()
@@ -179,12 +201,15 @@ function M.init(opts)
   utils.run("tar -xvpf %s -C %s", BUILD_DIR..LUA_FILENAME, BUILD_DIR)
   utils.run("tar -xvpf %s -C %s", BUILD_DIR..LUAROCKS_FILENAME, BUILD_DIR)
 
-  local lua_dir = BUILD_DIR.."lua-"..LUA_VERSION
+  local lua_dir = BUILD_DIR..LUA_NAME_PREFIX..LUA_VERSION
   local luarocks_dir = BUILD_DIR.."luarocks-"..LUAROCKS_VERSION
 
-  utils.build_lua(lua_dir, PLATFORM, DIRECTORY)
+  lua_build_function(lua_dir, PLATFORM, DIRECTORY)
   utils.build_luarocks(luarocks_dir, DIRECTORY)
-  utils.write_activate_script(activate_template, LUA_VERSION:sub(1,3), DIRECTORY)
+
+  activate_script_params.lua_version = LUA_COMPAT_VERSION
+  activate_script_params.prefix      = DIRECTORY
+  utils.write_activate_script(activate_template, activate_script_params)
 
   print("ok")
 end
