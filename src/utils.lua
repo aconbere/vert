@@ -58,6 +58,23 @@ function M.build_lua(lua_dir, platform, top)
   lfs.chdir(current_dir)
 end
 
+function M.build_luajit(lua_dir, platform, top)
+  local current_dir = lfs.currentdir()
+  lfs.chdir(lua_dir)
+
+  M.ensure(M.run("make"), "make luajit failed")
+  M.ensure(M.run("make install DPREFIX=%s", top),
+         "install luajit failed")
+
+  -- creating a link for the binary if it does not exist (on development versions)
+  if not lfs.attributes(top.."/bin/luajit") then
+    lfs.chdir(top.."/bin")
+    M.ensure(M.run("ln -s luajit-* luajit"))
+  end
+
+  lfs.chdir(current_dir)
+end
+
 function M.build_luarocks(luarocks_dir, prefix)
   local current_dir = lfs.currentdir()
   lfs.chdir(luarocks_dir)
@@ -71,15 +88,17 @@ function M.build_luarocks(luarocks_dir, prefix)
   lfs.chdir(current_dir)
 end
 
-function M.write_activate_script(template, lua_version, prefix)
-  local activate_file, err = io.open(prefix.."/bin/activate", "w+")
+function M.write_activate_script(template, params)
+  local activate_file, err = io.open(params.prefix.."/bin/activate", "w+")
 
   if not activate_file then
     print("Failed to open activate file: "..err)
     os.exit(3)
   end
 
-  activate_file:write(string.format(template, lua_version, prefix))
+  activate_file:write((template:gsub("%%{([%w_]+)}", function(var)
+    return params[var] or ""
+  end)))
   activate_file:close()
 end
 
