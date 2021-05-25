@@ -70,6 +70,7 @@ function M.build_luajit(lua_dir, platform, top)
   if not lfs.attributes(top.."/bin/luajit") then
     lfs.chdir(top.."/bin")
     M.ensure(M.run("ln -s luajit-* luajit"))
+    M.ensure(M.run("ln -s luajit-* lua"))
   end
 
   lfs.chdir(current_dir)
